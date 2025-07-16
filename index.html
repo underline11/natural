@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solicitação de Documentos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #mensagem {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Solicitação de Documentos Internos</h1>
+    <form id="document-form">
+      <label>Nome Completo do(a) Colaborador(a)</label>
+      <input type="text" name="nome" required />
+
+      <label>Matrícula ou Registro Corporativo</label>
+      <input type="text" name="matricula" required />
+
+      <label>Departamento / Setor</label>
+      <input type="text" name="departamento" required />
+
+      <label>CPF do Colaborador (000.000.000-00)</label>
+      <input type="text" name="cpf" required placeholder="000.000.000-00" />
+
+      <label>Telefone / WhatsApp</label>
+      <input type="text" name="telefone" required placeholder="99999-9999" />
+
+      <label>E-mail</label>
+      <input type="email" name="email" required />
+
+      <label>Deseja receber o documento por:</label>
+      <select name="entrega" required>
+        <option value="">Selecione</option>
+        <option value="E-mail">E-mail</option>
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Retirada física no RH">Retirada física no RH</option>
+      </select>
+
+      <label>Tipo de Documento Solicitado:</label>
+      <select name="tipo_documento" required>
+        <option value="">Selecione</option>
+        <option>Contracheque</option>
+        <option>Comprovante de vínculo empregatício</option>
+        <option>Declaração de férias</option>
+        <option>Atestado de afastamento</option>
+        <option>Cópia de contrato de trabalho</option>
+        <option>Cópia de registro em carteira (digital)</option>
+        <option>Relatório de ponto</option>
+        <option>Certidão de tempo de serviço</option>
+        <option>Solicitação para outro setor</option>
+        <option>Outro</option>
+      </select>
+
+      <!-- Campos ocultos esperados pelo script -->
+      <input type="hidden" name="identificacao" value="Sem arquivo" />
+      <input type="hidden" name="outro_documento" value="Sem arquivo" />
+
+      <button type="submit">Enviar Solicitação</button>
+    </form>
+    <p id="mensagem"></p>
+  </div>
+
+  <script>
+    document.getElementById("document-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const mensagem = document.getElementById("mensagem");
+
+      const dados = {
+        nome: form.nome.value,
+        matricula: form.matricula.value,
+        departamento: form.departamento.value,
+        cpf: form.cpf.value,
+        telefone: form.telefone.value,
+        email: form.email.value,
+        entrega: form.entrega.value,
+        tipo_documento: form.tipo_documento.value,
+        identificacao: form.identificacao.value,
+        outro_documento: form.outro_documento.value
+      };
+
+      try {
+        const resposta = await fetch("https://script.google.com/macros/s/AKfycbztRCVT8lGmBaz1VcP0SmHcsokdJLMKUPc5uSe5YE8lMFa6PYWsgFlVTI45nbRMFTi8ZQ/exec", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(dados)
+        });
+
+        const texto = await resposta.text();
+        mensagem.textContent = texto;
+        mensagem.style.color = resposta.ok ? "green" : "red";
+        if (resposta.ok) form.reset();
+      } catch (erro) {
+        mensagem.textContent = "Erro ao enviar: " + erro.message;
+        mensagem.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>
